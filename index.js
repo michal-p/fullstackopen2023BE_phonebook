@@ -1,7 +1,7 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 const PORT = 3001
-
 let persons = [
   {
     "id": 1,
@@ -25,7 +25,19 @@ let persons = [
   }
 ]
 
-app.use(express.json())//Json parser
+app.use(express.json())//Json parser - middleware too(json-parser is taken into use before the requestLogger middleware, because otherwise request.body will not be initialized when the logger is executed!)
+morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+//Middleware -> https://expressjs.com/en/guide/using-middleware.html
+// const requestLogger = (request, response, next) => {
+//   console.log('Method:', request.method)
+//   console.log('Path:  ', request.path)
+//   console.log('Body:  ', request.body)
+//   console.log('---')
+//   next()
+// }
+// app.use(requestLogger)
+
 app.listen(PORT, () => {//Port
   console.log(`Server running on port ${PORT}`)
 })
@@ -63,6 +75,7 @@ const isNameExist = (name) => !!persons.find(p => p.name === name)
 
 //Post create single person entry
 app.post('/api/persons', (request, response) => {
+  // console.log(request.headers) //print all of the request headers
   const body = request.body
 
   if (!body.name || !body.number) {
@@ -85,3 +98,9 @@ app.post('/api/persons', (request, response) => {
 
   response.json(person)
 })
+
+//Middle ware -> catching requests made to non-existent routes so we call it after our routes definitions
+// const unknownEndpoint = (request, response) => {
+//   response.status(404).send({ error: 'unknown endpoint' })
+// }
+// app.use(unknownEndpoint)
