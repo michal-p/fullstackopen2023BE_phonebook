@@ -1,9 +1,22 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 const cors = require('cors')
-app.use(cors()) //cors middleware to allow cross origin resources to be fetched
+app.use(cors()) //cors middleware to allow cross origin resources to be fetche
+app.use(express.json())//Json parser - middleware too(json-parser is taken into use before the requestLogger middleware, because otherwise request.body will not be initialized when the logger is executed!)
+morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+//Middleware -> https://expressjs.com/en/guide/using-middleware.html
+// const requestLogger = (request, response, next) => {
+//   console.log('Method:', request.method)
+//   console.log('Path:  ', request.path)
+//   console.log('Body:  ', request.body)
+//   console.log('---')
+//   next()
+// }
+// app.use(requestLogger)
 
 let persons = [
   {
@@ -28,22 +41,6 @@ let persons = [
   }
 ]
 
-app.use(express.json())//Json parser - middleware too(json-parser is taken into use before the requestLogger middleware, because otherwise request.body will not be initialized when the logger is executed!)
-morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
-//Middleware -> https://expressjs.com/en/guide/using-middleware.html
-// const requestLogger = (request, response, next) => {
-//   console.log('Method:', request.method)
-//   console.log('Path:  ', request.path)
-//   console.log('Body:  ', request.body)
-//   console.log('---')
-//   next()
-// }
-// app.use(requestLogger)
-
-app.listen(PORT, () => {//Port
-  console.log(`Server running on port ${PORT}`)
-})
 //Get persons
 app.get('/api/persons', (request, response) => {
   response.json(persons)
