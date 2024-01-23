@@ -88,19 +88,20 @@ app.post('/api/persons', (request, response) => {
     })
   } 
   
-  if (isNameExist(body.name)) return response.status(400).json({
-    error: 'name must be unique'
-  })
+  // if (isNameExist(body.name)) return response.status(400).json({
+  //   error: 'name must be unique'
+  // })
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
     id: Math.floor(Math.random() * 10000)
-  }
+  })
 
-  persons = persons.concat(person)
-
-  response.json(person)
+  person.save().then(result => {
+    console.log('person saved! result: ', result)
+    response.json(result)
+  })
 })
 
 //Middle ware -> catching requests made to non-existent routes so we call it after our routes definitions
