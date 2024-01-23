@@ -1,7 +1,9 @@
+require('dotenv').config()
+const Person = require('./modules/person')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 const cors = require('cors')
 app.use(cors()) //cors middleware to allow cross origin resources to be fetche
@@ -44,7 +46,8 @@ let persons = [
 
 //Get persons
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  //The code automatically uses the defined toJSON when formatting notes to the response.
+  Person.find({}).then(people => response.json(people))
 })
 //Get info
 app.get('/info', (request, response) => {

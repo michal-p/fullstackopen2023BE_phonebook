@@ -12,7 +12,7 @@
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs"
-},
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/michal-p/fullstackopen2023BE_phonebook.git"
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/michal-p/fullstackopen2023BE_phonebook#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.3.2",
     "express": "^4.18.2",
     "mongoose": "^8.1.0",
     "morgan": "^1.10.0"
