@@ -6,8 +6,13 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+    "dev:debug": "nodemon --inspect index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../../fullstackopen2023/part2/phonebook/ && npm run build && cp -r dist ../../../fullstackopen2023BE/fullstackopen2023BE_phonebook",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/michal-p/fullstackopen2023BE_phonebook.git"

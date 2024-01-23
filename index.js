@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 const cors = require('cors')
 app.use(cors()) //cors middleware to allow cross origin resources to be fetche
+app.use(express.static('dist')) //middleware to show static content from FE
 app.use(express.json())//Json parser - middleware too(json-parser is taken into use before the requestLogger middleware, because otherwise request.body will not be initialized when the logger is executed!)
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
