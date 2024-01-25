@@ -44,22 +44,24 @@ let persons = [
 ]
 //Get info
 app.get('/info', (request, response) => {
-  response.send(
-    `<div>Phonebook has info for ${persons.length} people.</div>
-     <div>${new Date() }</div>
-    `
-    )
+  Person.find({})
+    .then(people => {
+      response.send(`<div>Phonebook has info for ${people.length} people.</div>
+                     <div>${new Date()}</div>`)
+    })
 })
 //Get persons
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   //The code automatically uses the defined toJSON when formatting notes to the response.
-  Person.find({}).then(people => response.json(people))
+  Person.find({})
+  .then(people => response.json(people))
+  .catch(error => next(error))
 })
 //Get single person entry
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-  person ? response.json(person) : response.status(404).end()
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(person => response.json(person))  // person ? response.json(person) : response.status(404).end()
+    .catch(error => next(error))
 })
 //Delete single person entry
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -72,7 +74,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 //Post create single person entry
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   // console.log(request.headers) //print all of the request headers
   const body = request.body
 
@@ -88,10 +90,12 @@ app.post('/api/persons', (request, response) => {
     id: Math.floor(Math.random() * 10000)
   })
 
-  person.save().then(result => {
+  person.save()
+  .then(result => {
     console.log('person saved! result: ', result)
     response.json(result)
   })
+  .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -107,7 +111,9 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 //Middle ware -> catching requests made to non-existent routes so we call it after our routes definitions
-const unknownEndpoint = (request, response) => response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
 app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
