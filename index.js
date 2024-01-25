@@ -42,12 +42,6 @@ let persons = [
     "number": "39-23-6423122"
   }
 ]
-
-//Get persons
-app.get('/api/persons', (request, response) => {
-  //The code automatically uses the defined toJSON when formatting notes to the response.
-  Person.find({}).then(people => response.json(people))
-})
 //Get info
 app.get('/info', (request, response) => {
   response.send(
@@ -56,15 +50,16 @@ app.get('/info', (request, response) => {
     `
     )
 })
+//Get persons
+app.get('/api/persons', (request, response) => {
+  //The code automatically uses the defined toJSON when formatting notes to the response.
+  Person.find({}).then(people => response.json(people))
+})
 //Get single person entry
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
   const person = persons.find(person => person.id === id)
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+  person ? response.json(person) : response.status(404).end()
 })
 //Delete single person entry
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -76,8 +71,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-const isNameExist = (name) => !!persons.find(p => p.name === name)
-
 //Post create single person entry
 app.post('/api/persons', (request, response) => {
   // console.log(request.headers) //print all of the request headers
@@ -88,10 +81,6 @@ app.post('/api/persons', (request, response) => {
       error: 'content missing'
     })
   } 
-  
-  // if (isNameExist(body.name)) return response.status(400).json({
-  //   error: 'name must be unique'
-  // })
 
   const person = new Person({
     name: body.name,
@@ -105,19 +94,24 @@ app.post('/api/persons', (request, response) => {
   })
 })
 
-//Middle ware -> catching requests made to non-existent routes so we call it after our routes definitions
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-app.use(unknownEndpoint)
-
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+  const person = {
+    name: body.name,
+    number: body.number,
   }
 
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => response.json(updatedPerson))
+    .catch(error => next(error))
+})
+
+//Middle ware -> catching requests made to non-existent routes so we call it after our routes definitions
+const unknownEndpoint = (request, response) => response.status(404).send({ error: 'unknown endpoint' })
+app.use(unknownEndpoint)
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  if (error.name === 'CastError') response.status(400).send({ error: 'malformatted id' })
   next(error)
 }
 app.use(errorHandler)
