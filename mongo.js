@@ -27,7 +27,7 @@ if (process.argv.length < 3) {
   console.log('give password as argument')
   process.exit(1)
 } else if(process.argv.length === 3) {
-  console.log('phonebook:');
+  console.log('phonebook:')
   listAllPeople()
 } else {
   const person = new Person({
@@ -35,7 +35,7 @@ if (process.argv.length < 3) {
     number: number,
     id: Math.floor(Math.random() * 10000)
   })
-  
+
   person.save().then(result => {
     console.log('person saved! result: ', result)
     mongoose.connection.close()

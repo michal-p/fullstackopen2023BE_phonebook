@@ -9,6 +9,7 @@ const cors = require('cors')
 app.use(cors()) //cors middleware to allow cross origin resources to be fetche
 app.use(express.static('dist')) //middleware to show static content from FE
 app.use(express.json())//Json parser - middleware too(json-parser is taken into use before the requestLogger middleware, because otherwise request.body will not be initialized when the logger is executed!)
+// eslint-disable-next-line no-unused-vars
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 const requestLogger = (request, response, next) => {
@@ -31,8 +32,8 @@ app.get('/info', (request, response) => {
 app.get('/api/persons', (request, response, next) => {
   //The code automatically uses the defined toJSON when formatting notes to the response.
   Person.find({})
-  .then(people => response.json(people))
-  .catch(error => next(error))
+    .then(people => response.json(people))
+    .catch(error => next(error))
 })
 //Get single person entry
 app.get('/api/persons/:id', (request, response, next) => {
@@ -44,7 +45,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => {
-      console.log('DELETE result :', result);
+      console.log('DELETE result :', result)
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -59,7 +60,7 @@ app.post('/api/persons', (request, response, next) => {
     return response.status(400).json({
       error: 'content missing'
     })
-  } 
+  }
 
   const person = new Person({
     name: body.name,
@@ -68,11 +69,11 @@ app.post('/api/persons', (request, response, next) => {
   })
 
   person.save()
-  .then(result => {
-    console.log('person saved! result: ', result)
-    response.json(result)
-  })
-  .catch(error => next(error))
+    .then(result => {
+      console.log('person saved! result: ', result)
+      response.json(result)
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -83,8 +84,8 @@ app.put('/api/persons/:id', (request, response, next) => {
     { name, number },
     { new: true, runValidators: true, context: 'query' }
   )
-  .then(updatedPerson => response.json(updatedPerson))
-  .catch(error => next(error))
+    .then(updatedPerson => response.json(updatedPerson))
+    .catch(error => next(error))
 })
 
 //Middle ware -> catching requests made to non-existent routes so we call it after our routes definitions
